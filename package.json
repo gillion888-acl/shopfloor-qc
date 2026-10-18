@@ -1,0 +1,15 @@
+{
+  "name": "shopfloor-qc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "车间质检本 — 中小制造厂车间离线的质检逐笔记录与异常追溯。零依赖、零后端、可静态部署。",
+  "scripts": {
+    "test": "node --test",
+    "serve": "node serve.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

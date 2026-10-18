@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>车间质检本 · 车间没网络，也能一笔记下来</title>
+    <meta
+      name="description"
+      content="给中小制造厂检验员的离线质检记录本：机台边逐项记录、超限自动标红并开异常单、事后按批号查得到是谁检的、量到多少、用了什么料。纯本机运行，不需要 Wi-Fi，不需要 IT 部署。"
+    />
+    <meta name="theme-color" content="#0b6bcb" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b6bcb'/%3E%3Cpath d='M26 52l14 14 34-34' stroke='white' stroke-width='11' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+    <!-- 前端依赖本地内嵌：不依赖任何 CDN，车间断网也能打开 -->
+    <link rel="stylesheet" href="./element-plus.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script src="./vue.global.prod.js"></script>
+    <script src="./element-plus.full.min.js"></script>
+    <script src="./element-plus-icons.iife.min.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

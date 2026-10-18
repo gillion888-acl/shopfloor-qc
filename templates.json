@@ -1,0 +1,308 @@
+{
+  "app": "shopfloor-qc",
+  "version": 1,
+  "note": "内置示例检查项模板，由本项目自行编写，供五金冲压 / 塑胶射出 / 电子组装三类中小工厂直接改用。所有字段都可以在「模板」页改。",
+  "templates": [
+    {
+      "id": "tpl-metal",
+      "name": "五金冲压 · 首件与巡检",
+      "industry": "五金 / 冲压",
+      "builtin": true,
+      "note": "适合 25–200 吨冲床、连续模或单工程模；首件确认 + 每 2 小时巡检。",
+      "items": [
+        {
+          "id": "metal-1",
+          "name": "料厚",
+          "type": "number",
+          "unit": "mm",
+          "min": 0.95,
+          "max": 1.05,
+          "severity": "major",
+          "required": true,
+          "frequency": "每批",
+          "hint": "用千分尺量板料原始厚度，避开压印区。"
+        },
+        {
+          "id": "metal-2",
+          "name": "外径",
+          "type": "number",
+          "unit": "mm",
+          "min": 9.8,
+          "max": 10.2,
+          "severity": "critical",
+          "required": true,
+          "frequency": "首件",
+          "hint": "关键装配尺寸，超一点就装不上壳体。"
+        },
+        {
+          "id": "metal-3",
+          "name": "孔径",
+          "type": "number",
+          "unit": "mm",
+          "min": 4.95,
+          "max": 5.05,
+          "severity": "major",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "塞规通端过、止端不过视为合格。"
+        },
+        {
+          "id": "metal-4",
+          "name": "折弯角度",
+          "type": "number",
+          "unit": "°",
+          "min": 89,
+          "max": 91,
+          "severity": "major",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "角度尺量两侧，换模后必测。"
+        },
+        {
+          "id": "metal-5",
+          "name": "毛刺高度",
+          "type": "number",
+          "unit": "mm",
+          "max": 0.05,
+          "severity": "minor",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "手摸割手感明显就超标，可去毛刺返工。"
+        },
+        {
+          "id": "metal-6",
+          "name": "冲压面划痕",
+          "type": "bool",
+          "expect": "no",
+          "severity": "minor",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "迎光看，有明显划痕选「是」。"
+        },
+        {
+          "id": "metal-7",
+          "name": "表面处理",
+          "type": "option",
+          "okOptions": ["电镀", "喷涂", "本色"],
+          "options": ["电镀", "喷涂", "本色"],
+          "severity": "minor",
+          "required": true,
+          "frequency": "每批",
+          "hint": "按工单要求选；与前一批不一致要问主管。"
+        },
+        {
+          "id": "metal-8",
+          "name": "外观描述",
+          "type": "text",
+          "severity": "minor",
+          "required": false,
+          "frequency": "每 2 小时",
+          "hint": "看到什么写什么，例如「左下角轻微微碰伤 2 件」。"
+        }
+      ]
+    },
+    {
+      "id": "tpl-plastic",
+      "name": "塑胶射出 · 首件与过程巡检",
+      "industry": "塑胶 / 射出",
+      "builtin": true,
+      "note": "适合 80–250 吨注塑机；关注重量、关键尺寸与外观缺陷。",
+      "items": [
+        {
+          "id": "plastic-1",
+          "name": "射出件重量",
+          "type": "number",
+          "unit": "g",
+          "min": 12.4,
+          "max": 12.9,
+          "severity": "major",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "电子秤称 5 件取平均；重量最能反映模腔变化。"
+        },
+        {
+          "id": "plastic-2",
+          "name": "卡扣间距",
+          "type": "number",
+          "unit": "mm",
+          "min": 24.9,
+          "max": 25.1,
+          "severity": "critical",
+          "required": true,
+          "frequency": "首件",
+          "hint": "卡扣装不进就是这一项的问题，关键尺寸。"
+        },
+        {
+          "id": "plastic-3",
+          "name": "料温",
+          "type": "number",
+          "unit": "°C",
+          "min": 205,
+          "max": 225,
+          "severity": "major",
+          "required": true,
+          "frequency": "每 1 小时",
+          "hint": "看料筒温度表读数，别只看设定值。"
+        },
+        {
+          "id": "plastic-4",
+          "name": "缩水痕",
+          "type": "bool",
+          "expect": "no",
+          "severity": "minor",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "厚胶位背面最容易看到凹痕。"
+        },
+        {
+          "id": "plastic-5",
+          "name": "飞边",
+          "type": "bool",
+          "expect": "no",
+          "severity": "minor",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "分型面有薄薄一圈就是飞边。"
+        },
+        {
+          "id": "plastic-6",
+          "name": "熔接痕",
+          "type": "option",
+          "okOptions": ["无", "轻微"],
+          "options": ["无", "轻微", "明显"],
+          "severity": "minor",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "「明显」要调模温或射速。"
+        },
+        {
+          "id": "plastic-7",
+          "name": "色差",
+          "type": "option",
+          "okOptions": ["OK"],
+          "options": ["OK", "轻微", "明显"],
+          "severity": "minor",
+          "required": true,
+          "frequency": "每批",
+          "hint": "与封样件比对，别用记忆比。"
+        },
+        {
+          "id": "plastic-8",
+          "name": "外观描述",
+          "type": "text",
+          "severity": "minor",
+          "required": false,
+          "frequency": "每 2 小时",
+          "hint": "例如「第 3 腔有轻微银纹」。"
+        }
+      ]
+    },
+    {
+      "id": "tpl-electronics",
+      "name": "电子组装 · 功能测试与外观",
+      "industry": "电子 / 组装",
+      "builtin": true,
+      "note": "适合小家电、电源适配器、线束组装线；含通电功能项。",
+      "items": [
+        {
+          "id": "elec-1",
+          "name": "空载电流",
+          "type": "number",
+          "unit": "mA",
+          "max": 80,
+          "severity": "major",
+          "required": true,
+          "frequency": "每批",
+          "hint": "串电流表测，超过 80 mA 说明有短路风险。"
+        },
+        {
+          "id": "elec-2",
+          "name": "输入电压",
+          "type": "number",
+          "unit": "V",
+          "min": 4.9,
+          "max": 5.1,
+          "severity": "critical",
+          "required": true,
+          "frequency": "每批",
+          "hint": "用稳压源给定值，偏离就是电源板问题。"
+        },
+        {
+          "id": "elec-3",
+          "name": "输出电压",
+          "type": "number",
+          "unit": "V",
+          "min": 4.75,
+          "max": 5.25,
+          "severity": "critical",
+          "required": true,
+          "frequency": "每批",
+          "hint": "万用表量输出端，带额定负载。"
+        },
+        {
+          "id": "elec-4",
+          "name": "螺丝扭力",
+          "type": "number",
+          "unit": "kgf·cm",
+          "min": 8,
+          "max": 10,
+          "severity": "major",
+          "required": true,
+          "frequency": "首件",
+          "hint": "扭力计复紧，看是否达到设定值。"
+        },
+        {
+          "id": "elec-5",
+          "name": "通电亮灯",
+          "type": "bool",
+          "expect": "yes",
+          "severity": "critical",
+          "required": true,
+          "frequency": "每批",
+          "hint": "插电 3 秒内指示灯亮；不亮整批不能出。"
+        },
+        {
+          "id": "elec-6",
+          "name": "焊接质量",
+          "type": "option",
+          "okOptions": ["良好"],
+          "options": ["良好", "虚焊", "假焊", "脱焊"],
+          "severity": "major",
+          "required": true,
+          "frequency": "每 2 小时",
+          "hint": "虚焊、假焊、脱焊都要挑出来返修。"
+        },
+        {
+          "id": "elec-7",
+          "name": "异响",
+          "type": "bool",
+          "expect": "no",
+          "severity": "minor",
+          "required": true,
+          "frequency": "每批",
+          "hint": "贴耳听 5 秒，有滋滋声选「是」。"
+        },
+        {
+          "id": "elec-8",
+          "name": "包装贴标",
+          "type": "option",
+          "okOptions": ["正确"],
+          "options": ["正确", "错标", "漏贴"],
+          "severity": "minor",
+          "required": true,
+          "frequency": "每批",
+          "hint": "核对型号、批次号、客户标签。"
+        },
+        {
+          "id": "elec-9",
+          "name": "外观描述",
+          "type": "text",
+          "severity": "minor",
+          "required": false,
+          "frequency": "每批",
+          "hint": "例如「上下壳段差 0.3 mm，客户可接受」。"
+        }
+      ]
+    }
+  ]
+}

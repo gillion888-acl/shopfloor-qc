@@ -1,0 +1,1023 @@
+/* ==========================================================================
+   车间质检本 · 主题层
+
+   设计方向（一句话）
+   ------------------
+   像机台上那把钢制游标卡尺、和盖在检验单上的那方印章：
+   冷灰钢面板、卡尺刻线一样的 2px 结构边框、刻度字符一样的等宽大数字；
+   整页只有一个地方是响的 ——「不合格」。其余一律安静。
+   不像办公室 SaaS：没有渐变、没有飘在卡片下的灰影子、没有粉色警示条、没有细体浅灰字。
+
+   读法
+   ----
+   Element Plus 负责组件，这一层负责三件事：
+     1) 车间灯光下的对比度与大字号（三米外能看出哪一项超限）；
+     2) 戴手套 / 油污手指也能按准的触控尺寸（数字键区、正负键、是/否键）；
+     3) 暗色模式是「为暗环境重新设计」，不是把亮色反过来。
+
+   改造后的颜色/间距/字号全部来自下面 :root 里的 token，正文里不再出现散落的色值。
+   亮色 = 车间白炽灯下的钢板；暗色 = 夜班只开局部照明的暗环境。
+   ========================================================================== */
+
+:root {
+  /* ---------- 表面：冷灰钢板（不是暖米色，也不是假黑） ---------- */
+  --color-bg: #e7ecf1;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f4f7;
+  --color-surface-3: #dde4ea;
+
+  /* ---------- 文字：最深的是数据，不是标题 ---------- */
+  --color-foreground: #0f172a;
+  --color-muted-foreground: #46556a; /* 对白底 7.5:1 */
+  --color-subtle-foreground: #5d6b7a; /* 占位符 / 坐标轴 5.4:1，不拿来写正文 */
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: #d6dee8;
+
+  /* ---------- 边界：2px 是结构线（承重），1px 只做内部分隔 ---------- */
+  --color-border-strong: #9aabb8;
+  --color-border: #c3ced8;
+  --color-border-soft: #dfe6ec;
+
+  /* ---------- 主色：钢青（机台面板那一层冷灰蓝） ---------- */
+  --color-primary: #334155;
+  --color-primary-strong: #1f2b3a;
+  --color-primary-line: #6b829e;
+  --color-primary-soft: #e3e9f0;
+  --color-primary-wash: #3d4f64;
+
+  /* ---------- 合格：卡尺上那道绿色刻线，安静 ---------- */
+  --color-accent-fill: #059669;
+  --color-accent-ink: #04664a; /* 白底 7:1，白字压在上面 6.4:1 */
+  --color-accent-soft: #e6f4ee;
+
+  /* ---------- 不合格：全产品唯一的大胆 ---------- */
+  /* 与 qc.js 里「报废」同一个红族，现场不会出现两种红 */
+  --color-fail: #c01048;
+  --color-fail-strong: #8e0b34;
+  --color-fail-ink: #a00c3c;
+  --color-fail-soft: #fbe7ed;
+
+  /* 现场读数板（超限项整行）：亮色下是实心红板 —— 车间灯下三米外可见 */
+  --readout-fail-surface: #c01048;
+  --readout-fail-edge: #8e0b34;
+  --readout-fail-ink: #ffffff;
+  --readout-fail-ink-muted: #ffdfe7;
+  --readout-fail-field: #ffffff;
+  --readout-fail-field-ink: #a00c3c;
+
+  /* ---------- 待填 / 偏离：琥珀 ---------- */
+  --color-warn: #b54708;
+  --color-warn-ink: #8a3606;
+  --color-warn-soft: #fbefe0;
+
+  /* ---------- 信息 / 排查模式 ---------- */
+  --color-info: #0b5fbf;
+  --color-info-ink: #0a4f9e;
+  --color-info-soft: #e5effa;
+
+  --color-ring: #334155;
+
+  /* ---------- 首屏工位牌（深钢牌） ---------- */
+  --panel-hero-bg: #334155;
+  --panel-hero-line: #1f2b3a;
+  --panel-hero-wash: #3d4f64;
+  --panel-hero-ink: #ffffff;
+  --panel-hero-ink-muted: #d6dee8;
+  --panel-hero-cta-bg: #ffffff;
+  --panel-hero-cta-ink: #1f2b3a;
+  --panel-hero-cta-hover: #e6ecf3;
+
+  /* ---------- 抬升：只给真的浮在内容之上的东西 ---------- */
+  /* 卡片一律不投影 —— 阴影是「谁在上面」的信息，不是装饰 */
+  --elevation-overlay: 0 22px 44px -22px rgba(15, 23, 42, 0.55);
+  --elevation-sticky: 0 -10px 22px -18px rgba(15, 23, 42, 0.55);
+  --overlay-scrim: rgba(15, 23, 42, 0.55);
+
+  /* ---------- 间距刻度 ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ---------- 圆角：钢板/量具方，手指目标圆 ---------- */
+  --radius-plate: 3px;
+  --radius-chip: 4px;
+  --radius-control: 10px;
+  --radius-stamp: 5px;
+
+  /* ---------- 字号 ---------- */
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-base: 17px;
+  --text-md: 19px;
+  --text-lg: 22px;
+  --text-xl: 26px;
+  --text-2xl: 30px;
+  --text-3xl: 36px;
+  --text-readout: 34px; /* 现场数字输入 */
+  --text-stamp: 17px; /* 印章字 */
+  --leading-tight: 1.25;
+  --leading-body: 1.6;
+
+  /* ---------- 字体：全部系统自带，车间断网也照常 ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --font-num: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas,
+    "Noto Sans Mono CJK SC", monospace;
+
+  /* ---------- 触控 ---------- */
+  --tap: 56px;
+  --tap-lg: 64px;
+
+  /* ---------- 动效：只回应操作，不做入场动画 ---------- */
+  --motion: 150ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
+
+  /* ---------- 兼容 app.js 里写死的 inline 颜色（保持 DOM 与逻辑不动） ---------- */
+  --fail: var(--color-fail-ink);
+  --warn: var(--color-warn-ink);
+  --ink-2: var(--color-muted-foreground);
+  --line: var(--color-border-soft);
+  --line-strong: var(--color-border-strong);
+
+  /* ---------- Element Plus 映射 ---------- */
+  --el-color-primary: var(--color-primary);
+  --el-color-primary-light-3: var(--color-primary-line);
+  --el-color-primary-light-5: var(--color-border-strong);
+  --el-color-primary-light-7: var(--color-border);
+  --el-color-primary-light-8: var(--color-border-soft);
+  --el-color-primary-light-9: var(--color-primary-soft);
+  --el-color-primary-dark-2: var(--color-primary-strong);
+  --el-color-success: var(--color-accent-ink);
+  --el-color-success-light-3: var(--color-accent-fill);
+  --el-color-success-light-9: var(--color-accent-soft);
+  --el-color-success-dark-2: var(--color-accent-ink);
+  --el-color-warning: var(--color-warn);
+  --el-color-warning-light-3: var(--color-warn);
+  --el-color-warning-light-9: var(--color-warn-soft);
+  --el-color-warning-dark-2: var(--color-warn-ink);
+  --el-color-danger: var(--color-fail);
+  --el-color-danger-light-3: var(--color-fail);
+  --el-color-danger-light-9: var(--color-fail-soft);
+  --el-color-danger-dark-2: var(--color-fail-strong);
+  --el-color-error: var(--color-fail);
+  --el-color-error-light-3: var(--color-fail);
+  --el-color-error-light-9: var(--color-fail-soft);
+  --el-color-error-dark-2: var(--color-fail-strong);
+  --el-color-info: var(--color-muted-foreground);
+  --el-color-info-light-9: var(--color-surface-2);
+
+  --el-bg-color: var(--color-surface);
+  --el-bg-color-page: var(--color-bg);
+  --el-bg-color-overlay: var(--color-surface);
+  --el-text-color-primary: var(--color-foreground);
+  --el-text-color-regular: var(--color-muted-foreground);
+  --el-text-color-secondary: var(--color-subtle-foreground);
+  --el-text-color-placeholder: var(--color-subtle-foreground);
+  --el-text-color-disabled: var(--color-subtle-foreground);
+  --el-border-color: var(--color-border);
+  --el-border-color-light: var(--color-border-soft);
+  --el-border-color-lighter: var(--color-border-soft);
+  --el-border-color-extra-light: var(--color-border-soft);
+  --el-border-color-dark: var(--color-border-strong);
+  --el-border-color-darker: var(--color-border-strong);
+  --el-fill-color: var(--color-surface-2);
+  --el-fill-color-light: var(--color-surface-2);
+  --el-fill-color-lighter: var(--color-surface-2);
+  --el-fill-color-blank: var(--color-surface);
+  --el-mask-color: var(--overlay-scrim);
+  --el-box-shadow: var(--elevation-overlay);
+  --el-box-shadow-light: var(--elevation-overlay);
+  --el-font-family: var(--font-sans);
+  --el-font-size-base: var(--text-base);
+  --el-border-radius-base: var(--radius-control);
+  --el-border-radius-small: var(--radius-chip);
+  --el-border-radius-round: var(--radius-control);
+  --el-component-size: var(--tap);
+  --el-component-size-large: var(--tap-lg);
+  --el-component-size-small: 40px;
+  --el-transition-duration: var(--motion);
+  --el-transition-duration-fast: var(--motion);
+  --el-tag-border-radius: var(--radius-chip);
+  --el-dialog-border-radius: var(--radius-plate);
+  --el-dialog-padding-primary: var(--space-5);
+  --el-drawer-padding-primary: var(--space-5);
+  --el-messagebox-border-radius: var(--radius-plate);
+}
+
+/* ==========================================================================
+   暗色：为暗环境重新设计
+   - 大面积surface 压到很低的亮度，但不落进纯黑（纯黑会把边框和字都吃掉）
+   - 边框反而要加强：暗环境里靠亮度差分不开面，只能靠线
+   - 不合格不再是实心红板（整屏红会眩光），改成暗红板 + 发光边 + 发白光的大数字
+   - 合格绿降饱和，避免在暗处刺眼；正文不用纯白，减少光晕
+   ========================================================================== */
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #0e141a;
+  --color-surface: #18212a;
+  --color-surface-2: #121a22;
+  --color-surface-3: #22303c;
+
+  --color-foreground: #e9eff6;
+  --color-muted-foreground: #a7b6c4;
+  --color-subtle-foreground: #8598a8;
+  --color-on-primary: #ffffff;
+  --color-on-primary-muted: #cddced;
+
+  --color-border-strong: #5a6e7d;
+  --color-border: #3c4c59;
+  --color-border-soft: #26333e;
+
+  --color-primary: #4e7099;
+  --color-primary-strong: #6e92bc;
+  --color-primary-line: #86a6cc;
+  --color-primary-soft: #1c2b3c;
+  --color-primary-wash: #22303f;
+
+  --color-accent-fill: #2e9e78;
+  --color-accent-ink: #6fd3ac;
+  --color-accent-soft: #10281f;
+
+  --color-fail: #ff5c74;
+  --color-fail-strong: #ff8a9c;
+  --color-fail-ink: #ff9db0;
+  --color-fail-soft: #2e1119;
+
+  --readout-fail-surface: #45101f;
+  --readout-fail-edge: #ff5c74;
+  --readout-fail-ink: #ffffff;
+  --readout-fail-ink-muted: #ffd7de;
+  --readout-fail-field: #1b0a10;
+  --readout-fail-field-ink: #ffffff;
+
+  --color-warn: #f0a93c;
+  --color-warn-ink: #f5c77e;
+  --color-warn-soft: #2e2312;
+
+  --color-info: #6fa8e8;
+  --color-info-ink: #9dc4f2;
+  --color-info-soft: #12243a;
+
+  --color-ring: #a8c2de;
+
+  --panel-hero-bg: #1b2735;
+  --panel-hero-line: #2e4055;
+  --panel-hero-wash: #22303f;
+  --panel-hero-ink: #e9eff6;
+  --panel-hero-ink-muted: #b9c9d8;
+  --panel-hero-cta-bg: #e9eff6;
+  --panel-hero-cta-ink: #10151b;
+  --panel-hero-cta-hover: #ffffff;
+
+  --elevation-overlay: 0 22px 44px -20px rgba(0, 0, 0, 0.75);
+  --elevation-sticky: 0 -10px 22px -18px rgba(0, 0, 0, 0.7);
+  --overlay-scrim: rgba(6, 10, 14, 0.72);
+
+  /* Element Plus 里几个需要跟着一起暗下来的填充 */
+  --el-fill-color-light: #1b242d;
+  --el-fill-color-lighter: #1b242d;
+}
+
+/* ==========================================================================
+   基础
+   ========================================================================== */
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, h4 { margin: 0; line-height: var(--leading-tight); }
+
+a { color: var(--color-primary); text-decoration-thickness: 2px; }
+
+/* 键盘可达：所有可点元素都有看得见的焦点圈 */
+:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-chip);
+}
+
+/* ---------- 顶栏：机台铭牌条 ---------- */
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 2px solid var(--color-border-strong);
+}
+
+.brand { display: flex; gap: var(--space-3); align-items: center; min-width: 0; }
+
+.brand .mark {
+  width: 46px; height: 46px; flex: 0 0 46px;
+  display: grid; place-items: center;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary-strong);
+  border-radius: var(--radius-plate);
+}
+
+.brand .name { display: block; font-size: var(--text-md); font-weight: 800; }
+.brand .sub { display: block; font-size: var(--text-xs); font-weight: 600; color: var(--color-muted-foreground); }
+
+.topright { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+
+/* 顶栏两个状态标签：本机存储 / 联网。常态是安静的钢板标签，只有真出问题（存不住）才变红 */
+.top .topright .el-tag {
+  height: 44px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+}
+.top .topright .el-tag.el-tag--danger {
+  color: var(--color-on-primary);
+  background: var(--color-fail);
+  border-color: var(--color-fail-strong);
+}
+.top .topright .el-button {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-foreground);
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+}
+
+/* ---------- 导航：工位按钮条 ---------- */
+
+.nav {
+  position: sticky;
+  top: 64px;
+  z-index: 25;
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  overflow-x: auto;
+  background: var(--color-surface);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.nav button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: background var(--motion) var(--ease), color var(--motion) var(--ease),
+    border-color var(--motion) var(--ease), box-shadow var(--motion) var(--ease);
+}
+
+.nav button .el-icon { font-size: 20px; }
+.nav button:hover { color: var(--color-primary); background: var(--color-primary-soft); }
+
+/* 当前工位：按下去的面板按钮（内凹），不是一颗悬浮的胶囊 */
+.nav button[aria-current='page'] {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary-strong);
+  box-shadow: inset 0 3px 8px var(--color-primary-strong);
+}
+
+/* 工序分组线：前四个是现场流程（开始 → 检验 → 异常 → 追溯），后三个是事后与设置。
+   这条竖线是两组的边界，不是装饰。 */
+.nav button:nth-child(5)::before {
+  content: "";
+  align-self: stretch;
+  width: 2px;
+  margin: var(--space-2) var(--space-3) var(--space-2) 0;
+  background: var(--color-border);
+}
+
+.nav .count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 var(--space-2);
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--color-on-primary);
+  background: var(--color-fail);
+  border-radius: var(--radius-chip);
+}
+.nav button[aria-current='page'] .count { box-shadow: 0 0 0 2px var(--color-primary); }
+
+/* ---------- 布局 ---------- */
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: var(--space-4) var(--space-4) var(--space-7); }
+
+.card {
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-plate);
+}
+
+.card > h2, .card > h3 { margin-bottom: var(--space-1); }
+.card h2 { font-size: var(--text-lg); font-weight: 800; }
+.card h3 { font-size: var(--text-md); font-weight: 800; }
+
+.hint { margin: var(--space-1) 0 var(--space-4); font-size: var(--text-sm); color: var(--color-muted-foreground); }
+
+.grid { display: grid; gap: var(--space-4); }
+.grid.c2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.row { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; }
+.spread { display: flex; gap: var(--space-3); align-items: center; justify-content: space-between; flex-wrap: wrap; }
+
+/* ---------- 首屏：深钢工位牌 ---------- */
+
+.hero {
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  color: var(--panel-hero-ink);
+  background: var(--panel-hero-bg);
+  border: 2px solid var(--panel-hero-line);
+}
+
+.hero h1 { font-size: var(--text-2xl); font-weight: 800; }
+.hero p.lead { margin: var(--space-3) 0 0; max-width: 760px; font-size: var(--text-base); color: var(--panel-hero-ink-muted); }
+
+.hero .who {
+  display: inline-block;
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  background: var(--panel-hero-wash);
+  border: 1px solid var(--panel-hero-line);
+  border-radius: var(--radius-chip);
+}
+
+/* 三步是真的有先后（选模板 → 量测 → 开单/追溯），所以这里保留编号 */
+.steps { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: var(--space-5); }
+.step {
+  padding: var(--space-3) var(--space-4);
+  background: var(--panel-hero-wash);
+  border: 1px solid var(--panel-hero-line);
+  border-radius: var(--radius-plate);
+}
+.step b { display: block; font-size: var(--text-xs); font-weight: 800; color: var(--panel-hero-ink-muted); }
+.step span { display: block; margin-top: var(--space-1); font-size: var(--text-sm); }
+
+.hero-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; margin-top: var(--space-5); }
+.hero-actions .el-button {
+  height: auto;
+  min-height: 58px;
+  padding: 0 var(--space-5);
+  font-size: var(--text-md);
+  font-weight: 800;
+}
+/* 深色牌面上，主要动作要是整块牌里最亮的那颗按钮 —— 蓝色按钮压在钢牌上等于看不见 */
+.hero-actions .el-button--primary {
+  color: var(--panel-hero-cta-ink);
+  background: var(--panel-hero-cta-bg);
+  border-color: var(--panel-hero-cta-bg);
+}
+.hero-actions .el-button--primary:hover {
+  color: var(--panel-hero-cta-ink);
+  background: var(--panel-hero-cta-hover);
+  border-color: var(--panel-hero-cta-hover);
+}
+.hero-actions .el-button:not(.el-button--primary):not(.is-text) {
+  color: var(--panel-hero-ink);
+  background: transparent;
+  border: 2px solid var(--panel-hero-line);
+}
+.hero-actions .el-button:not(.el-button--primary):not(.is-text):hover {
+  color: var(--panel-hero-ink);
+  background: var(--panel-hero-wash);
+  border-color: var(--panel-hero-ink-muted);
+}
+/* 首屏是深色牌面，文字按钮要跟着提亮 */
+.hero-actions .el-button.is-text { color: var(--panel-hero-ink-muted); }
+.hero-actions .el-button.is-text:hover { color: var(--panel-hero-ink); background: var(--panel-hero-wash); }
+
+/* ---------- 数字牌（统计） ---------- */
+
+.stat {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-plate);
+}
+.stat .k { font-size: var(--text-xs); font-weight: 700; color: var(--color-muted-foreground); }
+.stat .v {
+  margin-top: var(--space-1);
+  font-family: var(--font-num);
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.stat .v.small { font-size: var(--text-md); }
+.stat.bad .v { color: var(--color-fail-ink); }
+.stat.good .v { color: var(--color-accent-ink); }
+
+/* ---------- 提示条：左边那条粗轨就是严重度 ---------- */
+
+.banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-left-width: 8px;
+  border-radius: var(--radius-plate);
+}
+.banner .bt { font-size: var(--text-md); font-weight: 800; }
+.banner .bd { font-size: var(--text-sm); color: var(--color-muted-foreground); }
+
+.banner.info { border-left-color: var(--color-info); }
+.banner.info .bt { color: var(--color-info-ink); }
+.banner.warn { background: var(--color-warn-soft); border-left-color: var(--color-warn); }
+.banner.warn .bt { color: var(--color-warn-ink); }
+.banner.fail { background: var(--color-fail-soft); border-left-color: var(--color-fail); }
+.banner.fail .bt { color: var(--color-fail-ink); }
+.banner.ok { background: var(--color-accent-soft); border-left-color: var(--color-accent-ink); }
+.banner.ok .bt { color: var(--color-accent-ink); }
+
+/* ---------- 表头字段（工单 / 批号 / 机台 / 检验员 / 批量） ---------- */
+
+.inspect-head {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+/* 字段名。用 padding 而不是 margin 做下间距：app.js 里这些 span 带 inline margin:0 */
+.inspect-head .hint,
+.pick-label {
+  display: block;
+  margin: 0;
+  padding-bottom: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+}
+
+.big-input {
+  width: 100%;
+  min-width: 120px;
+  min-height: var(--tap);
+  padding: 2px var(--space-3);
+  font-family: var(--font-num);
+  font-size: var(--text-readout);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  box-shadow: inset 0 3px 0 var(--color-surface-2);
+  transition: border-color var(--motion) var(--ease), box-shadow var(--motion) var(--ease);
+}
+.big-input::placeholder { font-weight: 700; color: var(--color-subtle-foreground); }
+.big-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 3px 0 var(--color-surface-2), 0 0 0 3px var(--color-primary-soft);
+  outline: none;
+}
+
+/* 现场用系统自带的日期选择器，比自绘的控件在平板上更好按 */
+.date-input,
+.text-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+}
+
+/* 带历史记录的自由文本（工单 / 批号 / 机台 / 检验员）：用原生 datalist，
+   输入即提交，不依赖下拉弹出的选择动作 —— 车间里少一步就少一次出错 */
+.text-input::placeholder { font-weight: 400; color: var(--color-subtle-foreground); }
+.text-input:focus { border-color: var(--color-primary); outline: none; }
+select.text-input { font-weight: 600; }
+
+html[data-theme='dark'] .date-input,
+html[data-theme='dark'] .text-input { color-scheme: dark; }
+
+/* 选择按钮：是/否、选项、模板、班别都用它 —— 戴手套点得中，
+   且不依赖组件库的 radio 语义（本项目实测所内嵌版本的 radio-group 不回传选中值） */
+.pickgroup { display: inline-flex; gap: var(--space-2); flex-wrap: wrap; }
+
+button.pick {
+  min-height: var(--tap);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: background var(--motion) var(--ease), color var(--motion) var(--ease),
+    border-color var(--motion) var(--ease), box-shadow var(--motion) var(--ease);
+}
+button.pick:hover { color: var(--color-primary); background: var(--color-primary-soft); border-color: var(--color-primary); }
+button.pick.active {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary-strong);
+  box-shadow: inset 0 3px 8px var(--color-primary-strong);
+}
+button.pick.big { min-width: 104px; min-height: var(--tap-lg); font-size: var(--text-lg); }
+
+/* ==========================================================================
+   逐项检验：一行一项，像卡尺上的一道刻度
+   - 左边那条粗轨是状态刻度：中性＝已量合格、琥珀＝还没填、红＝超限
+   - 超限那一行整行翻红，并把数字所在的框一起翻过来 —— 三米外先看到红，再看到数
+   ========================================================================== */
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) minmax(300px, auto);
+  gap: var(--space-3) var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-left: 8px solid var(--color-border-strong);
+  border-radius: var(--radius-plate);
+  transition: border-color var(--motion) var(--ease), background var(--motion) var(--ease);
+}
+
+.item.is-pass { border-left-color: var(--color-border); }
+.item.is-empty { border-left-color: var(--color-warn); }
+
+.item .iname { font-size: var(--text-lg); font-weight: 800; }
+.item .ispec {
+  margin-top: var(--space-1);
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground);
+}
+.item .imeta { display: flex; gap: var(--space-1); flex-wrap: wrap; margin-top: var(--space-2); }
+.item .ifield { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.item .ifield .unit {
+  min-width: 34px;
+  font-family: var(--font-num);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+}
+
+/* 现场是戴着手套点的：正负键放大到 64×64，离数字框留出一指宽的间隙，免得误触 */
+.item .ifield .el-button {
+  min-width: var(--tap-lg);
+  min-height: var(--tap-lg);
+  padding: 0;
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+.item .ifield .el-button.is-text {
+  min-width: 0;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+}
+.item .ifield .el-button.is-text:hover { color: var(--color-primary); background: var(--color-primary-soft); }
+.item .big-input { min-width: 130px; min-height: var(--tap-lg); }
+
+/* ---------- 超限行：全产品唯一的大胆 ---------- */
+
+.item.is-fail {
+  --fail: var(--readout-fail-ink-muted);
+  --warn: var(--readout-fail-ink-muted);
+  --ink-2: var(--readout-fail-ink-muted);
+  background: var(--readout-fail-surface);
+  border-color: var(--readout-fail-edge);
+  border-left: 10px solid var(--readout-fail-edge);
+}
+.item.is-fail .iname { color: var(--readout-fail-ink); }
+.item.is-fail .ispec,
+.item.is-fail .hint { color: var(--readout-fail-ink-muted); }
+.item.is-fail .big-input {
+  min-height: var(--tap-lg);
+  padding: 2px var(--space-2);
+  color: var(--readout-fail-field-ink);
+  background: var(--readout-fail-field);
+  border: 3px solid var(--readout-fail-edge);
+  box-shadow: none;
+}
+.item.is-fail .big-input:focus { box-shadow: 0 0 0 3px var(--readout-fail-ink); }
+.item.is-fail .ifield .unit { color: var(--readout-fail-ink); }
+.item.is-fail .ifield .el-button:not(.is-text) {
+  color: var(--readout-fail-surface);
+  background: var(--readout-fail-ink);
+  border: 2px solid var(--readout-fail-ink);
+}
+.item.is-fail .ifield .el-button.is-text { color: var(--readout-fail-ink-muted); }
+.item.is-fail .ifield .el-button.is-text:hover { color: var(--readout-fail-surface); background: var(--readout-fail-ink); }
+.item.is-fail button.pick {
+  color: var(--readout-fail-ink);
+  background: transparent;
+  border-color: var(--readout-fail-edge);
+}
+.item.is-fail button.pick.active {
+  color: var(--readout-fail-surface);
+  background: var(--readout-fail-ink);
+  border-color: var(--readout-fail-ink);
+  box-shadow: none;
+}
+.item.is-fail .tag {
+  color: var(--readout-fail-ink);
+  background: transparent;
+  border-color: var(--readout-fail-edge);
+}
+.item.is-fail .tag.crit {
+  color: var(--readout-fail-surface);
+  background: var(--readout-fail-ink);
+  border-color: var(--readout-fail-ink);
+}
+
+/* ---------- 判定结果：合格是安静的描边，不合格盖上印章 ---------- */
+
+.judge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-num);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  border: 2px solid transparent;
+  border-radius: var(--radius-chip);
+}
+.judge.pass { color: var(--color-muted-foreground); background: transparent; border-color: var(--color-border-soft); }
+.judge.empty { color: var(--color-warn-ink); background: var(--color-warn-soft); border-color: var(--color-warn); }
+.judge.fail,
+.judge.invalid {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-stamp);
+  letter-spacing: 0.12em;
+  color: var(--readout-fail-ink);
+  background: transparent;
+  border: 3px solid var(--readout-fail-ink);
+  border-radius: var(--radius-stamp);
+  transform: rotate(-4deg);
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-muted-foreground);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-chip);
+}
+.tag.crit { color: var(--color-on-primary); background: var(--color-fail); border-color: var(--color-fail-strong); }
+.tag.major { color: var(--color-warn-ink); background: var(--color-warn-soft); border-color: var(--color-warn); }
+.tag.minor { color: var(--color-muted-foreground); background: var(--color-surface-2); }
+.tag.req { color: var(--color-primary); background: var(--color-primary-soft); border-color: var(--color-border-strong); }
+
+/* ---------- 吸底操作条：现场最主要的那颗按钮 ---------- */
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-plate);
+  box-shadow: var(--elevation-sticky);
+}
+.sticky-actions b {
+  font-family: var(--font-num);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+}
+.sticky-actions .el-button { min-height: var(--tap-lg); padding: 0 var(--space-5); font-size: var(--text-md); font-weight: 800; }
+
+/* 没填完时保存键是「锁住的」，不是「看不清的」 */
+.el-button--primary {
+  --el-button-disabled-bg-color: var(--color-surface-3);
+  --el-button-disabled-text-color: var(--color-muted-foreground);
+  --el-button-disabled-border-color: var(--color-border);
+}
+
+/* ---------- 照片 ---------- */
+
+.thumbs { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.thumb {
+  position: relative;
+  width: 116px; height: 116px;
+  overflow: hidden;
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-plate);
+}
+.thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.thumb .del {
+  position: absolute; top: var(--space-1); right: var(--space-1);
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  font-size: var(--text-base);
+  color: var(--color-on-primary);
+  background: var(--color-primary-strong);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+.thumb .cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 2px var(--space-2);
+  font-family: var(--font-num);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-on-primary);
+  background: var(--color-primary-strong);
+}
+
+/* ---------- 表格：追溯与报表的数据面 ---------- */
+
+.el-table {
+  --el-table-border-color: var(--color-border);
+  --el-table-header-bg-color: var(--color-surface-2);
+  --el-table-header-text-color: var(--color-foreground);
+  --el-table-text-color: var(--color-foreground);
+  --el-table-bg-color: var(--color-surface);
+  --el-table-tr-bg-color: var(--color-surface);
+  --el-table-row-hover-bg-color: var(--color-primary-soft);
+  --el-table-expanded-cell-bg-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+}
+.el-table .el-table__cell { padding: var(--space-2) 0; }
+.el-table th.el-table__cell > .cell { font-size: var(--text-sm); font-weight: 800; }
+.el-table .cell { font-size: var(--text-sm); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- 图表（SVG 手画） ---------- */
+
+.chart { display: block; width: 100%; height: auto; }
+.chart .axis { stroke: var(--color-border-strong); stroke-width: 1.5; }
+.chart .grid { stroke: var(--color-border-soft); stroke-width: 1; stroke-dasharray: 4 4; }
+.chart .bar-ok { fill: var(--color-primary); }
+.chart .bar-fail { fill: var(--color-fail); }
+.chart .bar-lab { font-size: 12.5px; font-weight: 600; fill: var(--color-muted-foreground); text-anchor: middle; }
+.chart .bar-val { font-size: 13px; font-weight: 800; fill: var(--color-foreground); text-anchor: middle; }
+.chart .ylabel { font-size: 12px; fill: var(--color-subtle-foreground); }
+
+.segbar { display: flex; height: 26px; overflow: hidden; border: 2px solid var(--color-border); border-radius: var(--radius-chip); }
+.segbar i { display: block; height: 100%; }
+.legend { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-3); font-size: var(--text-sm); font-weight: 600; }
+.legend span { display: inline-flex; align-items: center; gap: var(--space-2); }
+.legend i { width: 14px; height: 14px; display: inline-block; border: 1px solid var(--color-border); border-radius: var(--radius-chip); }
+
+.hbar { display: grid; grid-template-columns: minmax(96px, 170px) 1fr auto; gap: var(--space-3); align-items: center; margin-bottom: var(--space-2); font-weight: 600; }
+.hbar .track { height: 22px; overflow: hidden; background: var(--color-surface-2); border: 2px solid var(--color-border); border-radius: var(--radius-chip); }
+.hbar .fill { display: block; height: 100%; background: var(--color-fail); }
+.hbar .num { font-family: var(--font-num); font-size: var(--text-base); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ---------- 对话框 / 抽屉 / 全局提示：真的浮在内容之上，所以才有抬升 ---------- */
+
+.el-dialog,
+.el-drawer,
+.el-message-box {
+  background: var(--color-surface);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-plate);
+  box-shadow: var(--elevation-overlay);
+}
+.el-dialog__header { padding-bottom: var(--space-3); border-bottom: 2px solid var(--color-border-soft); }
+.el-dialog__title { font-size: var(--text-md); font-weight: 800; color: var(--color-foreground); }
+.el-dialog__body { padding: var(--space-5) 0; font-size: var(--text-base); }
+.el-overlay { background: var(--overlay-scrim); }
+.el-message-box__title { font-size: var(--text-md); font-weight: 800; }
+.el-message {
+  font-size: var(--text-base);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-plate);
+}
+
+/* ---------- 打印 ---------- */
+
+@media print {
+  html {
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-2: #ffffff;
+    --color-foreground: #000000;
+    --color-muted-foreground: #333333;
+    --color-subtle-foreground: #333333;
+    --color-border: #999999;
+    --color-border-soft: #bbbbbb;
+    --color-border-strong: #666666;
+    /* 纸上的「不合格」不靠红底，靠粗黑框 + 印章，省墨也看得清 */
+    --readout-fail-surface: #ffffff;
+    --readout-fail-edge: #000000;
+    --readout-fail-ink: #000000;
+    --readout-fail-ink-muted: #333333;
+    --readout-fail-field: #ffffff;
+    --readout-fail-field-ink: #000000;
+  }
+  body { background: var(--color-bg); font-size: 11.5pt; }
+  .top, .nav, .no-print, .el-drawer__close-btn, .el-button { display: none !important; }
+  .wrap { max-width: none; padding: 0; }
+  .card { box-shadow: none; border: 1.5px solid var(--color-border); page-break-inside: avoid; }
+  .hero { color: var(--color-foreground) !important; background: none !important; border-color: var(--color-border) !important; }
+  .print-title { display: block !important; }
+}
+
+.print-title { display: none; }
+
+/* ---------- 窄屏（平板竖握 / 手机） ---------- */
+
+@media (max-width: 760px) {
+  body { font-size: var(--text-base); }
+  /* 窄屏顶栏会折成两三层，再 sticky 就会把导航压到背后。
+     手机上让铭牌随页面滚走，只留导航吸顶 —— 现场要的是「切到哪一页」。 */
+  .top { position: static; gap: var(--space-2); padding: var(--space-2) var(--space-3); }
+  .top .topright .el-tag,
+  .top .topright .el-button { height: 38px; min-height: 38px; }
+  .brand .mark { width: 40px; height: 40px; flex-basis: 40px; }
+  .wrap { padding: var(--space-3) var(--space-3) 120px; }
+  .card { padding: var(--space-4); }
+  .hero { padding: var(--space-5) var(--space-4); }
+  .hero h1 { font-size: var(--text-xl); }
+  .nav { top: 0; padding: var(--space-2); }
+  .nav button { min-height: 50px; padding: 0 var(--space-3); }
+  /* 窄屏导航本来就要横向滑动，分组竖线这时只会添乱 */
+  .nav button:nth-child(5)::before { display: none; }
+  .inspect-head { grid-template-columns: 1fr; }
+  .item { grid-template-columns: 1fr; }
+  .item .ifield { justify-content: flex-start; }
+}
+
+@media (max-width: 430px) {
+  .item .ifield { gap: var(--space-2); }
+  .item .ifield .el-button { min-width: var(--tap); }
+  .item .ifield .el-button.is-text { padding: 0 var(--space-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
