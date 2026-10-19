@@ -114,7 +114,7 @@ node --test         # 运行全部单元测试（78 个）
 | `http://localhost:4220/?storage=local` | 强制只用 localStorage（记录存 JSON、照片存 dataURL，照片预算降到 2 MB） |
 | `http://localhost:4220/?storage=memory` | 强制只用内存，界面会亮出「一刷新就没了」的红色警告 |
 
-根目录的 `sample-photo.png` 是**程序生成的示例照片**（不是真实客户照片），用于验证「拍照 / 选照片」这条链路：拖进录入界面后会在本机压缩再落库。
+根目录的 `sample-photo.png` 是**AI 生成的合成示意图**（由 Google 生成式 AI 产出、文件内嵌 C2PA 内容凭证，不是任何真实工厂或客户的照片），用于验证「拍照 / 选照片」这条链路：拖进录入界面后会在本机压缩再落库。
 
 ## 使用流程
 
@@ -154,7 +154,7 @@ shopfloor-qc/
 ├── qc.test.mjs                    领域逻辑单元测试
 ├── store.test.mjs                 存储层单元测试
 ├── serve.mjs                      本地静态服务（仅用于预览，端口 4220）
-├── sample-photo.png               程序生成的示例照片（验证拍照与压缩链路）
+├── sample-photo.png               AI 生成的合成示意图（含 C2PA 凭证；验证拍照与压缩链路）
 ├── screenshot-1-home.png          截图：开始页
 ├── screenshot-2-inspect.png       截图：现场检验
 ├── screenshot-3-dark.png          截图：暗色主题
